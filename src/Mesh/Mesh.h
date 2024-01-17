@@ -40,6 +40,10 @@ class Mesh
 
     ptrdiff_t glob_n_[3];
 
+    ptrdiff_t cx;
+    ptrdiff_t cy;
+    ptrdiff_t cz;
+
     scalar dx_;
     scalar dy_;
     scalar dz_; 
@@ -63,10 +67,8 @@ class Mesh
 
     bool hyperbollic_;
 
-#ifdef HAVE_PFFT
-    ptrdiff_t alloc_local_;
-    ptrdiff_t local_ni_[3], local_i_start_[3];
-    ptrdiff_t local_no_[3], local_o_start_[3];
+#ifdef HAVE_FFTMPI
+    ptrdiff_t localStart_[3]; 
 #endif
 
     public:
@@ -154,30 +156,14 @@ class Mesh
         return bboxHalo_;
     } 
 
-#ifdef HAVE_PFFT
-    ptrdiff_t alloc_local()
-    {
-        return alloc_local_;
-    }
+#ifdef HAVE_FFTMPI
     ptrdiff_t* glob_n()
     {
         return glob_n_;
     }
-    ptrdiff_t* local_ni()
+    ptrdiff_t* localStart()
     {
-        return local_ni_;
-    }
-    ptrdiff_t* local_i_start()
-    {
-        return local_i_start_;
-    }
-    ptrdiff_t* local_no()
-    {
-        return local_no_;
-    }
-    ptrdiff_t* local_o_start()
-    {
-        return local_o_start_;
+        return localStart_;
     }
 #endif
 

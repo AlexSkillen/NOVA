@@ -39,8 +39,8 @@
 #include "MUI/mui.h"
 #endif
 
-#ifdef HAVE_PFFT
-#include "pfft.h"
+#ifdef HAVE_FFTMPI
+#include "fft3d.h"
 #endif
 
 template <class T>
@@ -57,7 +57,6 @@ class parallelCom
 #ifdef HAVE_MPI
     static boost::mpi::environment env_;
     static boost::mpi::communicator world_;
-    static MPI_Comm pfftcomm_;
 #endif
 
 #ifdef HAVE_MUI
@@ -71,7 +70,6 @@ class parallelCom
 
 private:
     parallelCom() {};
-    static void initpfft_();
 
 public:
     //access
@@ -181,11 +179,6 @@ public:
     {
         return world_;
     }
-    
-    static MPI_Comm& pfftcomm()
-    {
-        return pfftcomm_;
-    }
 #endif
 
 #ifdef HAVE_MUI
@@ -217,11 +210,6 @@ public:
     static void initMUI( std::string, Box );  
 
 #endif
-
-
-
-
-
 
 };
 

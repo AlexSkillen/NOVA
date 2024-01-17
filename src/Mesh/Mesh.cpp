@@ -71,17 +71,20 @@ Mesh::Mesh( std::string fileName, Time& runTime )
     lx_=lx;
     ly_=ly;
     lz_=lz;
+    
+//for( int i=settings::m()/2; i<ni-settings::m()/2; i++ )
+//    {   
+//        for( int j=settings::m()/2; j<nj-settings::m()/2; j++ )
+//        {   
+//            for( int k=settings::m()/2; k<nk()-settings::m()/2; k++ )
+//            {   
+//                cx = (i-settings::m()/2)*mesh.dx +mesh.origin().x();
+//                cy = (j-settings::m()/2)*mesh.dy +mesh.origin().y();
+//                cz = (k-settings::m()/2)*mesh.dz +mesh.origin().z();
+//	    }
+//	}
+//    }
 
-#ifdef HAVE_PFFT
-    alloc_local_ = pfft_local_size_dft_r2c_3d(glob_n_, parallelCom::pfftcomm(), PFFT_TRANSPOSED_NONE,
-            local_ni_, local_i_start_, local_no_, local_o_start_);
-
-    ni_=local_ni_[0]+1;
-    nj_=local_ni_[1]+1;
-    nk_=local_ni_[2]+1;
-
-    origin_ = vector( dx_*local_i_start_[0]+ox, dy_*local_i_start_[1]+oy, dz_*local_i_start_[2]+oz );
-#else
     ni_= ni/parallelCom::ni() + 1; 
     nj_= nj/parallelCom::nj() + 1; 
     nk_= nk/parallelCom::nk() + 1; 
@@ -100,6 +103,10 @@ Mesh::Mesh( std::string fileName, Time& runTime )
     }
 
     origin_ = vector( (ni_-1)*dx_*parallelCom::i()+ox, (nj_-1)*dy_*parallelCom::j()+oy, (nk_-1)*dz_*parallelCom::k()+oz );
+#ifdef HAVE_FFTMPI
+    localStart_[0] = origin_[0];
+    localStart_[1] = origin_[1];
+    localStart_[2] = origin_[2];
 #endif
     int ni_copy = ni_;
     int nj_copy = nj_;
@@ -363,8 +370,8 @@ scalar Mesh::z( int k ) const
     if( hyperbollic_ )
     {
         scalar A = std::pow( s1_/s2_, 0.5 );
-#ifdef HAVE_PFFT
-        int globK = k-settings::m()/2 + local_i_start_[2];
+#ifdef HAVE_FFTMPI
+        int globK = k-settings::m()/2 + localStart_[2];
 #else 
         int globK = k-settings::m()/2 + (parallelCom::k())*(nk_-settings::m()-1);
 #endif

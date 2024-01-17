@@ -18,7 +18,9 @@
         (
            -ex::div( U, U )
            +ex::laplacian( mu, U ) 
-        );
+           +ex::div( B, B )
+           -ex::grad( 0.5*(B&B) )
+	);
 
         Ustar = UOld;
         for( int j=0; j<=rk; j++ )
@@ -28,7 +30,7 @@
 
         Ustar.correctBoundaryConditions();
         pEqn.rhs(ex::div(Ustar) / time.dt() / settings::RK4c()[rk]);
-	pEqn.solve();
+        pEqn.solve();
         p.correctBoundaryConditions();
         U = Ustar - settings::RK4c()[rk]*time.dt() * ex::grad(p);
 
